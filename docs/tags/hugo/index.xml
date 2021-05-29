@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>hugo on 郑仲森的个人博客</title>
+    <link>/tags/hugo/</link>
+    <description>Recent content in hugo on 郑仲森的个人博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 25 Feb 2021 01:04:21 +0800</lastBuildDate><atom:link href="/tags/hugo/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>如何使用 Hugo 写博客</title>
+      <link>/tech/2021/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8hugo%E5%86%99%E5%8D%9A%E5%AE%A2/</link>
+      <pubDate>Thu, 25 Feb 2021 01:04:21 +0800</pubDate>
+      
+      <guid>/tech/2021/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8hugo%E5%86%99%E5%8D%9A%E5%AE%A2/</guid>
+      <description>1. 快速入门   创建 markdown 文件
+进入博客的主目录，使用 hugo 命令创建一个 markdown 文件，用来写文章，文件的初始内容从模板文件 archetypes/default.md 初始化得到的。
+hugo new content/tech/test.md   本地预览站点
+写完文章后，启用本地服务器，打开地址 http://127.0.0.1:1313/ 进行本地预览，参数 -D 表示草稿也渲染出来。
+hugo server -D   生成静态站点文件
+本地预览没问题后，再生成html文件，生成的静态站点文件都默认存放在 public 目录中。默认情况下草稿状态的文章不会渲染。而且 public 目录中的文件不会被删除，只会增量更新。如果要保持和最新的 content 目录完全一致，则先手动把 public 目录删除，再重新生成html文件。可以使用参数 -d 指定生成的站点静态文件的存放目录。
+hugo -d 目标目录   2. 常见问题 2.1 VSCode 和 Hugo 的 Markdown 图片路径问题 问题现象   假设我们将 Hugo 站点目录作为 VSCode 的工程根目录打开。
+  Hugo 默认使用 static 目录作为静态文件的根目录，图片文件需要放在 static 目录。假设图片路径是 static/imgs/test.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -8,6 +8,72 @@
     <language>en-us</language>
     <lastBuildDate>Sun, 22 Nov 2020 17:23:58 +0800</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>条件变量详解</title>
+      <link>/tech/2021/%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/</link>
+      <pubDate>Sat, 29 May 2021 16:33:33 +0800</pubDate>
+      
+      <guid>/tech/2021/%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/</guid>
+      <description>多线程之间的同步机制有两大类，分别是：
+ 互斥锁（mutex），多个线程同时访问共享变量时可以加锁保证数据的可以被正确修改和访问。 条件变量（Condition Variable），一个线程通知其他线程，可能有它感兴趣的事件发生了（一些共享变量的状态发生了变化），其他线程可以阻塞在条件变量那里，等待事件发生。  本文主要介绍条件变量的一些基本概念和使用上的注意事项。
+1. 基本概念 条件变量总是和互斥锁以及一些表示某些状态的共享变量一起使用，互斥锁可以保护这些共享变量在多线程环境下的读写安全，允许线程阻塞等待其他条件发生。和条件变量相关的两个基本原语操作是 signal 和 wait。
+ signal 操作：通知一个或者多个等待的线程，它们感兴趣的共享变量的状态发生变化了。 wait 操作：线程阻塞在条件变量那里，直到收到这个条件变量相关的通知。  1.1 signal 操作 int pthread_cond_signal(pthread_cond_t *cond); int pthread_cond_broadcast(pthread_cond_t *cond); 这两个函数都会对指定的条件变量产生信号，通知其他线程。唯一一个区别在于当有多个线程阻塞等待条件变量的信号时，这两个函数产生信号后，对其他线程产生的影响会不一样。
+ pthread_cond_signal 会保证至少会唤醒其中一个阻塞在这个条件变量的的线程。 pthread_cond_broadcast 会唤醒所有阻塞在这个条件变量的线程，适用于那些阻塞的不同线程被唤醒后会处理不同的任务。 pthread_cond_signal 的适用场景  当所有阻塞的线程被唤醒后处理的任务一样，那么只要能唤醒其中一个阻塞的线程就行，而不关注哪个线程被唤醒。 或者只有一个线程被阻塞等待条件变量。 pthread_cond_broadcast 的适用场景：被阻塞的多个线程被设计成唤醒后处理不同的任务。    相比 pthread_cond_broadcast 而言，pthread_cond_signal 效率会比较高一些，如果使用pthread_cond_broadcast的话，会多了下面几个开销。
+ 所有的线程都会被唤醒。 第一个被唤醒的线程，检查共享变量的状态，发现需要进行处理，就直接将事情处理好了，同时共享变量的状态也被修改为不需要进行其他处理的状态值。 其他剩余的线程都会被唤醒，同时尝试获取互斥锁，同时检查共享变量的状态，看看是否需要进行其他处理。但是由于这个共享变量的状态已经被之前的修改了，所以不需要进行其他事情，就会释放锁，同时再次进入阻塞状态。  1.2 wait 操作 int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex); int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *abstime); pthread_cond_wait 函数会进行下面两个操作：</description>
+    </item>
+    
+    <item>
+      <title>阻塞性socket的读写超时处理</title>
+      <link>/tech/2021/%E9%98%BB%E5%A1%9E%E6%80%A7socket%E7%9A%84%E8%AF%BB%E5%86%99%E8%B6%85%E6%97%B6%E5%A4%84%E7%90%86/</link>
+      <pubDate>Sun, 16 May 2021 19:07:46 +0800</pubDate>
+      
+      <guid>/tech/2021/%E9%98%BB%E5%A1%9E%E6%80%A7socket%E7%9A%84%E8%AF%BB%E5%86%99%E8%B6%85%E6%97%B6%E5%A4%84%E7%90%86/</guid>
+      <description>1. 读写接口可能永远阻塞吗 对于 TCP socket 而言，write 和 read 有可能永远阻塞吗？答案是两个接口都有可能会导致永远阻塞。
+ 对于阻塞性的 TCP socket 而言，write 只是将用户态的数据复制到内核态的发送缓冲区中，只要写成功了，就立即返回。如果发送缓冲区满了，则将会阻塞在 write 函数，直到超时返回错误（如果设置了写超时时间）或者永远阻塞住； 而对于 read 接口，如果读取不到指定长度的数据，会一直等待下去，直到全部读取到，或者出现了其他错误。  如何避免阻塞性socket 可能造成的永久阻塞呢？一种比较常用的处理方法，给读写接口加上超时限制。
+ 通过 setsockopt 设置 socket 的读写超时 SO_SNDTIMEO 和 SO_RCVTIMEO 对 write 和 read 接口进行封装，避免因为信号中断导致的系统调用接口提前返回失败。一般系统调用被信号中断后，会返回失败 EINTR，如果这时候重新调用读写接口，相应的超时时间会重新开始计算。  通过查看 man 7 signal 的相关帮助文档，可以查看不同系统调用对信号中断场景的响应效果。比如，如果阻塞性 socket 设置了 SO_RCVTIMEO 超时时间，当 recv 被信号中断，则会立即返回 EINTR 错误。如果这时候重新调用 recv 接口，则会重新计算超时时间。
+2. recvn的实现 对于信号中断下的 recvn 处理，有两种实现。第一种实现，适用于中断信号是偶然出现的场景，出现信号中断，再重新尝试即可，这也是比较常见的处理方式。
+ssize_t recvn(int sockfd, void *buf, size_t len, int flags) { ssize_t left = len; ssize_t has_read = 0; char *ptr = buf; while (left &amp;gt; 0) { has_read = recv(sockfd, ptr, left, flags); if (has_read &amp;lt; 0) { if (errno == EINTR) { continue; } break; } if (has_read == 0) { break; } left -= has_read; ptr += has_read; } return len - left; } 上面讲的第一种实现，不能适用于那种定时产生信号，而且时间间隔小于recv设置的超时时间的使用场景，这样子 recv 会每次都被中断返回错误，导致永远不会超时。我们需要在 recv 返回时判断总花费时间是否超过了限制。下面的实现比较超时时间的精确度比较低，如果要实现比较精确的超时时间，在每次 recv 返回时，可以重新设置 recv 的超时时间。</description>
+    </item>
+    
+    <item>
+      <title>volatile 在多线程中是否有必要使用？</title>
+      <link>/tech/2021/volatile-%E5%9C%A8%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%AD%E6%98%AF%E5%90%A6%E6%9C%89%E5%BF%85%E8%A6%81%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Sun, 16 May 2021 19:02:47 +0800</pubDate>
+      
+      <guid>/tech/2021/volatile-%E5%9C%A8%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%AD%E6%98%AF%E5%90%A6%E6%9C%89%E5%BF%85%E8%A6%81%E4%BD%BF%E7%94%A8/</guid>
+      <description>1. volatile 的作用 volatile，中文含义是容易发生变化的。这个修饰符将告诉 gcc 编译器，对这类变量的访问尽可能的减少优化。
+对C和C++而言，volatile 关键字在多线程编程中不是必须使用的。volatile并不会保证它修饰的变量的相关操作是原子性的和线程安全的，线程安全应该由线程同步和互斥的相关原语来保证。
+当然一些可能用到 volatile 修饰符的场景：
+ 访问内存映射IO的设备 在setjmp 和 longjmp 之间使用的变量 在信号处理函数里面使用 sig_atomic_t 变量 在代码里面没有修改这个变量的地方，但是可能通过一些外部手段修改，比如gdb，通过使用 volatile 修饰符，可以避免 gcc 进行优化  2. volatile 的使用效果对比 没有使用 volatile 修饰的测试代码 t1.c
+// t1.c static int s_foo = 1; int test() { if (s_foo == 2) { return 0; } return 1; } 使用gcc -S -O3 t1.c -o t1.s 生成对应的汇编代码如下，因为 s_foo 变量没有在其他地方被修改，所以可以看到 s_foo == 2 的条件判断被直接优化掉了，函数直接返回 1 ，如果这时候用 gdb 去将 s_foo修改为2，test 函数还是返回 1。</description>
+    </item>
+    
+    <item>
+      <title>TCP/IP协议简介</title>
+      <link>/tech/2021/tcpip%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B/</link>
+      <pubDate>Sat, 20 Mar 2021 13:57:11 +0800</pubDate>
+      
+      <guid>/tech/2021/tcpip%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B/</guid>
+      <description>1. 背景 TCP/IP 协议最主要解决的问题是不同终端之间如何相互通信的问题。不同通信实体之间要实现通信，在需求和底层实现上都有一定的复杂性。
+ 不同计算机的硬件组成不同，有不同的网络接口，CPU架构和处理性能等。 不同计算机所在的网络硬件基础不同，比如有些是以太网，有些是无线网络等。 数据在底层传输时，可能会出现问题，比如丢包，乱序，数据出现错误。 跨网络传输时，不同网络能够发送的数据包大小，发送速度等都会不一样。 地址问题，如何对计算机进行地址编码 不同应用有不同的数据交互需求  2. TCP/IP协议的发展历史  1960 年代中期，不同的计算机还不能互相通信。 1967 年，ARPA（一个隶属于美国国防部的高级研究部门）提出了 ARPANET，在同一个网络中的不同计算机可以通过 IMP 节点相互通信。 1972 年，ARPA 的两个核心小组成员 Vint Cerf 和 Bob Kahn 提出 gateway 的概念，负责将数据从一个网络传递到另外一个网络。 1973 年，Cerf 和 Kahn 发表了关于点到点间的数据传输协议 TCP，提出了本地主机负责保证数据传输的可靠性。 1977 年，实现了在三个不同网络之间进行通信演示，后面TCP协议拆分成 Transmission Control Protocol 和 Internet Protocol 两个协议，两者结合起来就是我们现在所说的TCP/IP。 1981 年，UC Berkeley 大学在 Unix 系统中实现了 TCP/IP协议 1983 年, TCP/IP 协议正式成为 ARPANET 的官方协议，同时将军方专用的网络独立才出来，成立了 MILNET，ARPNET保留着给普通用户使用。  3. OSI 模型 在1970年代，International Standards Organization(ISO) 提出了 Open Systems Interconnection(OSI) 模型，包含了网络通信的所有方面，是一个分层了网络框架，可以使得不同的计算机系统可以在不改变其硬件和软件逻辑的基础上，实现相互通信。</description>
+    </item>
+    
+    <item>
+      <title>如何使用 Hugo 写博客</title>
+      <link>/tech/2021/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8hugo%E5%86%99%E5%8D%9A%E5%AE%A2/</link>
+      <pubDate>Thu, 25 Feb 2021 01:04:21 +0800</pubDate>
+      
+      <guid>/tech/2021/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8hugo%E5%86%99%E5%8D%9A%E5%AE%A2/</guid>
+      <description>1. 快速入门   创建 markdown 文件
+进入博客的主目录，使用 hugo 命令创建一个 markdown 文件，用来写文章，文件的初始内容从模板文件 archetypes/default.md 初始化得到的。
+hugo new content/tech/test.md   本地预览站点
+写完文章后，启用本地服务器，打开地址 http://127.0.0.1:1313/ 进行本地预览，参数 -D 表示草稿也渲染出来。
+hugo server -D   生成静态站点文件
+本地预览没问题后，再生成html文件，生成的静态站点文件都默认存放在 public 目录中。默认情况下草稿状态的文章不会渲染。而且 public 目录中的文件不会被删除，只会增量更新。如果要保持和最新的 content 目录完全一致，则先手动把 public 目录删除，再重新生成html文件。可以使用参数 -d 指定生成的站点静态文件的存放目录。
+hugo -d 目标目录   2. 常见问题 2.1 VSCode 和 Hugo 的 Markdown 图片路径问题 问题现象   假设我们将 Hugo 站点目录作为 VSCode 的工程根目录打开。
+  Hugo 默认使用 static 目录作为静态文件的根目录，图片文件需要放在 static 目录。假设图片路径是 static/imgs/test.</description>
+    </item>
+    
+    <item>
       <title>关于</title>
       <link>/about/</link>
       <pubDate>Sat, 08 Aug 2020 00:00:00 +0000</pubDate>

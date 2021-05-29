@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      
+      阻塞性socket的读写超时处理 | 郑仲森的个人博客</title>
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="bookmark" href="/favicon.ico" type="image/x-icon"　/>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">主页</a></li>
+      
+      <li><a href="/tech/">技术</a></li>
+      
+      <li><a href="/life/">生活</a></li>
+      
+      <li><a href="/categories/">专题</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/about/">关于</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">阻塞性socket的读写超时处理</span></h1>
+</div>
+
+<main>
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-读写接口可能永远阻塞吗">1. 读写接口可能永远阻塞吗</a></li>
+    <li><a href="#2-recvn的实现">2. recvn的实现</a></li>
+    <li><a href="#3-进一步阅读">3. 进一步阅读</a></li>
+  </ul>
+</nav>
+<hr/>
+<h2 id="1-读写接口可能永远阻塞吗">1. 读写接口可能永远阻塞吗</h2>
+<p>对于 TCP socket 而言，write 和 read 有可能永远阻塞吗？答案是两个接口都有可能会导致永远阻塞。</p>
+<ul>
+<li>对于阻塞性的 TCP socket 而言，write 只是将用户态的数据复制到内核态的发送缓冲区中，只要写成功了，就立即返回。如果发送缓冲区满了，则将会阻塞在 write 函数，直到超时返回错误（如果设置了写超时时间）或者永远阻塞住；</li>
+<li>而对于 read 接口，如果读取不到指定长度的数据，会一直等待下去，直到全部读取到，或者出现了其他错误。</li>
+</ul>
+<p>如何避免阻塞性socket 可能造成的永久阻塞呢？一种比较常用的处理方法，给读写接口加上超时限制。</p>
+<ul>
+<li>通过 setsockopt 设置 socket 的读写超时 SO_SNDTIMEO 和 SO_RCVTIMEO</li>
+<li>对 write 和 read 接口进行封装，避免因为信号中断导致的系统调用接口提前返回失败。一般系统调用被信号中断后，会返回失败 EINTR，如果这时候重新调用读写接口，相应的超时时间会重新开始计算。</li>
+</ul>
+<p>通过查看 man 7 signal 的相关帮助文档，可以查看不同系统调用对信号中断场景的响应效果。比如，如果阻塞性 socket 设置了 SO_RCVTIMEO 超时时间，当 recv 被信号中断，则会立即返回 EINTR 错误。如果这时候重新调用 recv 接口，则会重新计算超时时间。</p>
+<h2 id="2-recvn的实现">2. recvn的实现</h2>
+<p>对于信号中断下的 recvn 处理，有两种实现。第一种实现，适用于中断信号是偶然出现的场景，出现信号中断，再重新尝试即可，这也是比较常见的处理方式。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">ssize_t <span style="color:#a6e22e">recvn</span>(<span style="color:#66d9ef">int</span> sockfd, <span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span>buf, size_t len, <span style="color:#66d9ef">int</span> flags)
+{
+    ssize_t left <span style="color:#f92672">=</span> len;
+    ssize_t has_read <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>ptr <span style="color:#f92672">=</span> buf;
+    <span style="color:#66d9ef">while</span> (left <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+        has_read <span style="color:#f92672">=</span> recv(sockfd, ptr, left, flags);
+        <span style="color:#66d9ef">if</span> (has_read <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
+            <span style="color:#66d9ef">if</span> (errno <span style="color:#f92672">==</span> EINTR) {
+                <span style="color:#66d9ef">continue</span>;
+            }
+            <span style="color:#66d9ef">break</span>;
+        }
+        <span style="color:#66d9ef">if</span> (has_read <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+            <span style="color:#66d9ef">break</span>;
+        }
+        left <span style="color:#f92672">-=</span> has_read;
+        ptr <span style="color:#f92672">+=</span> has_read;
+    }
+
+    <span style="color:#66d9ef">return</span> len <span style="color:#f92672">-</span> left;
+}
+</code></pre></div><p>上面讲的第一种实现，不能适用于那种定时产生信号，而且时间间隔小于recv设置的超时时间的使用场景，这样子 recv 会每次都被中断返回错误，导致永远不会超时。我们需要在 recv 返回时判断总花费时间是否超过了限制。下面的实现比较超时时间的精确度比较低，如果要实现比较精确的超时时间，在每次 recv 返回时，可以重新设置 recv 的超时时间。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">/**
+</span><span style="color:#75715e"> * @param
+</span><span style="color:#75715e"> *  timeout, 超时时间，秒为单位
+</span><span style="color:#75715e"> */</span>
+ssize_t <span style="color:#a6e22e">recvn_timeout</span>(<span style="color:#66d9ef">int</span> sockfd, <span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span>buf, size_t len, <span style="color:#66d9ef">int</span> flags, <span style="color:#66d9ef">int</span> timeout)
+{
+    ssize_t left <span style="color:#f92672">=</span> len;
+    ssize_t has_read <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>ptr <span style="color:#f92672">=</span> buf;
+    uint64_t beg_ts <span style="color:#f92672">=</span> get_now_ns();
+
+    <span style="color:#66d9ef">while</span> (left <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+        has_read <span style="color:#f92672">=</span> recv(sockfd, ptr, left, flags);
+        <span style="color:#66d9ef">if</span> (has_read <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+            <span style="color:#66d9ef">break</span>;
+        }
+        <span style="color:#66d9ef">if</span> (has_read <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> errno <span style="color:#f92672">!=</span> EINTR) {
+            <span style="color:#66d9ef">break</span>;
+        }
+
+        left <span style="color:#f92672">-=</span> has_read;
+        ptr <span style="color:#f92672">+=</span> has_read;
+
+        <span style="color:#75715e">// 每次 recv 返回，都需要判断总花费时间是否超时
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> ((get_now_ts() <span style="color:#f92672">-</span> beg_ts) <span style="color:#f92672">/</span> NS_PER_SEC <span style="color:#f92672">&gt;</span> timeout) {
+            <span style="color:#66d9ef">break</span>;
+        }
+    }
+
+    <span style="color:#66d9ef">return</span> len <span style="color:#f92672">-</span> left;
+}
+</code></pre></div><h2 id="3-进一步阅读">3. 进一步阅读</h2>
+<ul>
+<li><a href="http://www.cs.cornell.edu/courses/cs4450/2018sp/sockets_slides.pdf">http://www.cs.cornell.edu/courses/cs4450/2018sp/sockets_slides.pdf</a></li>
+<li><a href="https://eklitzke.org/how-tcp-sockets-work">how-tcp-sockets-work</a></li>
+</ul>
+
+
+<br/>
+(全文完)
+</main>
+<hr/>
+<div class="single-footer">
+<ul>
+  
+  <li><i>专题:
+	
+	  
+	  <a href="/categories/%e7%bd%91%e7%bb%9c%e7%bc%96%e7%a8%8b"> #网络编程</a>
+	</i>
+  </li>
+  
+  
+  
+  
+  <li><i>
+  标签:
+	
+	  
+	  <a href="/tags/%e4%bf%a1%e5%8f%b7"> #信号</a>
+	</i>
+  </li>
+  
+
+
+  <li><i>更新: 2021/05/16</i></li>
+</ul>
+</div>
+
+
+  <footer>
+  
+  
+  <hr/>
+  © 2020 &ndash; 2020 <a href="/">郑仲森</a> | <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0</a>
+  
+  </footer>
+  </body>
+</html>
+

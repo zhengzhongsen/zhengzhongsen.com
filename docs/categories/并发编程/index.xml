@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>并发编程 on 郑仲森的个人博客</title>
+    <link>/categories/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/</link>
+    <description>Recent content in 并发编程 on 郑仲森的个人博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 29 May 2021 16:33:33 +0800</lastBuildDate><atom:link href="/categories/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>条件变量详解</title>
+      <link>/tech/2021/%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/</link>
+      <pubDate>Sat, 29 May 2021 16:33:33 +0800</pubDate>
+      
+      <guid>/tech/2021/%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3/</guid>
+      <description>多线程之间的同步机制有两大类，分别是：
+ 互斥锁（mutex），多个线程同时访问共享变量时可以加锁保证数据的可以被正确修改和访问。 条件变量（Condition Variable），一个线程通知其他线程，可能有它感兴趣的事件发生了（一些共享变量的状态发生了变化），其他线程可以阻塞在条件变量那里，等待事件发生。  本文主要介绍条件变量的一些基本概念和使用上的注意事项。
+1. 基本概念 条件变量总是和互斥锁以及一些表示某些状态的共享变量一起使用，互斥锁可以保护这些共享变量在多线程环境下的读写安全，允许线程阻塞等待其他条件发生。和条件变量相关的两个基本原语操作是 signal 和 wait。
+ signal 操作：通知一个或者多个等待的线程，它们感兴趣的共享变量的状态发生变化了。 wait 操作：线程阻塞在条件变量那里，直到收到这个条件变量相关的通知。  1.1 signal 操作 int pthread_cond_signal(pthread_cond_t *cond); int pthread_cond_broadcast(pthread_cond_t *cond); 这两个函数都会对指定的条件变量产生信号，通知其他线程。唯一一个区别在于当有多个线程阻塞等待条件变量的信号时，这两个函数产生信号后，对其他线程产生的影响会不一样。
+ pthread_cond_signal 会保证至少会唤醒其中一个阻塞在这个条件变量的的线程。 pthread_cond_broadcast 会唤醒所有阻塞在这个条件变量的线程，适用于那些阻塞的不同线程被唤醒后会处理不同的任务。 pthread_cond_signal 的适用场景  当所有阻塞的线程被唤醒后处理的任务一样，那么只要能唤醒其中一个阻塞的线程就行，而不关注哪个线程被唤醒。 或者只有一个线程被阻塞等待条件变量。 pthread_cond_broadcast 的适用场景：被阻塞的多个线程被设计成唤醒后处理不同的任务。    相比 pthread_cond_broadcast 而言，pthread_cond_signal 效率会比较高一些，如果使用pthread_cond_broadcast的话，会多了下面几个开销。
+ 所有的线程都会被唤醒。 第一个被唤醒的线程，检查共享变量的状态，发现需要进行处理，就直接将事情处理好了，同时共享变量的状态也被修改为不需要进行其他处理的状态值。 其他剩余的线程都会被唤醒，同时尝试获取互斥锁，同时检查共享变量的状态，看看是否需要进行其他处理。但是由于这个共享变量的状态已经被之前的修改了，所以不需要进行其他事情，就会释放锁，同时再次进入阻塞状态。  1.2 wait 操作 int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex); int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *abstime); pthread_cond_wait 函数会进行下面两个操作：</description>
+    </item>
+    
+    <item>
+      <title>volatile 在多线程中是否有必要使用？</title>
+      <link>/tech/2021/volatile-%E5%9C%A8%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%AD%E6%98%AF%E5%90%A6%E6%9C%89%E5%BF%85%E8%A6%81%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Sun, 16 May 2021 19:02:47 +0800</pubDate>
+      
+      <guid>/tech/2021/volatile-%E5%9C%A8%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%AD%E6%98%AF%E5%90%A6%E6%9C%89%E5%BF%85%E8%A6%81%E4%BD%BF%E7%94%A8/</guid>
+      <description>1. volatile 的作用 volatile，中文含义是容易发生变化的。这个修饰符将告诉 gcc 编译器，对这类变量的访问尽可能的减少优化。
+对C和C++而言，volatile 关键字在多线程编程中不是必须使用的。volatile并不会保证它修饰的变量的相关操作是原子性的和线程安全的，线程安全应该由线程同步和互斥的相关原语来保证。
+当然一些可能用到 volatile 修饰符的场景：
+ 访问内存映射IO的设备 在setjmp 和 longjmp 之间使用的变量 在信号处理函数里面使用 sig_atomic_t 变量 在代码里面没有修改这个变量的地方，但是可能通过一些外部手段修改，比如gdb，通过使用 volatile 修饰符，可以避免 gcc 进行优化  2. volatile 的使用效果对比 没有使用 volatile 修饰的测试代码 t1.c
+// t1.c static int s_foo = 1; int test() { if (s_foo == 2) { return 0; } return 1; } 使用gcc -S -O3 t1.c -o t1.s 生成对应的汇编代码如下，因为 s_foo 变量没有在其他地方被修改，所以可以看到 s_foo == 2 的条件判断被直接优化掉了，函数直接返回 1 ，如果这时候用 gdb 去将 s_foo修改为2，test 函数还是返回 1。</description>
+    </item>
+    
+  </channel>
+</rss>

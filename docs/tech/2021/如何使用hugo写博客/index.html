@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      
+      如何使用 Hugo 写博客 | 郑仲森的个人博客</title>
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="bookmark" href="/favicon.ico" type="image/x-icon"　/>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">主页</a></li>
+      
+      <li><a href="/tech/">技术</a></li>
+      
+      <li><a href="/life/">生活</a></li>
+      
+      <li><a href="/categories/">专题</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/about/">关于</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">如何使用 Hugo 写博客</span></h1>
+</div>
+
+<main>
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-快速入门">1. 快速入门</a></li>
+    <li><a href="#2-常见问题">2. 常见问题</a>
+      <ul>
+        <li><a href="#21-vscode-和-hugo-的-markdown-图片路径问题">2.1 VSCode 和 Hugo 的 Markdown 图片路径问题</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+<hr/>
+<h2 id="1-快速入门">1. 快速入门</h2>
+<ul>
+<li>
+<p>创建 markdown 文件</p>
+<p>进入博客的主目录，使用 hugo 命令创建一个 markdown 文件，用来写文章，文件的初始内容从模板文件 <code>archetypes/default.md</code> 初始化得到的。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">hugo new content/tech/test.md
+</code></pre></div></li>
+<li>
+<p>本地预览站点</p>
+<p>写完文章后，启用本地服务器，打开地址 <code>http://127.0.0.1:1313/</code> 进行本地预览，参数 <code>-D</code> 表示草稿也渲染出来。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">hugo server -D
+</code></pre></div></li>
+<li>
+<p>生成静态站点文件</p>
+<p>本地预览没问题后，再生成html文件，生成的静态站点文件都默认存放在 public 目录中。默认情况下草稿状态的文章不会渲染。而且 public 目录中的文件不会被删除，只会增量更新。如果要保持和最新的 content 目录完全一致，则先手动把 public 目录删除，再重新生成html文件。可以使用参数 <code>-d</code> 指定生成的站点静态文件的存放目录。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">hugo -d 目标目录
+</code></pre></div></li>
+</ul>
+<h2 id="2-常见问题">2. 常见问题</h2>
+<h3 id="21-vscode-和-hugo-的-markdown-图片路径问题">2.1 VSCode 和 Hugo 的 Markdown 图片路径问题</h3>
+<h4 id="问题现象">问题现象</h4>
+<ul>
+<li>
+<p>假设我们将 Hugo 站点目录作为 VSCode 的工程根目录打开。</p>
+</li>
+<li>
+<p>Hugo 默认使用 <code>static</code> 目录作为静态文件的根目录，图片文件需要放在 <code>static</code> 目录。假设图片路径是 <code>static/imgs/test.png</code>。</p>
+</li>
+<li>
+<p>要使 Hugo 静态站点可以正常显示图片，则图片路径应该写成</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown">![<span style="color:#f92672">test</span>](<span style="color:#a6e22e">/imgs/test.png</span>)
+</code></pre></div></li>
+<li>
+<p>要使 VSCode Markdown 预览可以正常显示图片，则图片路径应该写成</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown">![<span style="color:#f92672">test</span>](<span style="color:#a6e22e">/static/imgs/test.png</span>)
+</code></pre></div></li>
+<li>
+<p>两个路径相互矛盾，无法同时成立</p>
+</li>
+</ul>
+<h4 id="解决方法">解决方法</h4>
+<ul>
+<li>
+<p>在工程根目录下创建一个指向 <code>static/imgs</code> 目录的软链接 <code>imgs</code></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ln -s static/imgs/ imgs
+</code></pre></div></li>
+<li>
+<p>图片还是放在 <code>static/imgs/test.png</code></p>
+</li>
+<li>
+<p>Markdown 文件中的图片路径使用 Hugo 可以正常显示的图片路径</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown">![<span style="color:#f92672">test</span>](<span style="color:#a6e22e">/imgs/test.png</span>)
+</code></pre></div></li>
+<li>
+<p>vscode markdown 预览时，会去查找 <code>imgs/test.png</code> 文件，但是由于 <code>imgs</code> 目录软连接，所以实际是查找是 <code>static/imgs/test.png</code> 文件，也就可以正常显示图片了</p>
+</li>
+</ul>
+
+
+<br/>
+(全文完)
+</main>
+<hr/>
+<div class="single-footer">
+<ul>
+  
+  
+  
+  
+  <li><i>
+  标签:
+	
+	  
+	  <a href="/tags/hugo"> #hugo</a>
+	</i>
+  </li>
+  
+
+
+  <li><i>更新: 2021/05/16</i></li>
+</ul>
+</div>
+
+
+  <footer>
+  
+  
+  <hr/>
+  © 2020 &ndash; 2020 <a href="/">郑仲森</a> | <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0</a>
+  
+  </footer>
+  </body>
+</html>
+

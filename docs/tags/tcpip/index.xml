@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>TCPIP on 郑仲森的个人博客</title>
+    <link>/tags/tcpip/</link>
+    <description>Recent content in TCPIP on 郑仲森的个人博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 20 Mar 2021 13:57:11 +0800</lastBuildDate><atom:link href="/tags/tcpip/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>TCP/IP协议简介</title>
+      <link>/tech/2021/tcpip%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B/</link>
+      <pubDate>Sat, 20 Mar 2021 13:57:11 +0800</pubDate>
+      
+      <guid>/tech/2021/tcpip%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B/</guid>
+      <description>1. 背景 TCP/IP 协议最主要解决的问题是不同终端之间如何相互通信的问题。不同通信实体之间要实现通信，在需求和底层实现上都有一定的复杂性。
+ 不同计算机的硬件组成不同，有不同的网络接口，CPU架构和处理性能等。 不同计算机所在的网络硬件基础不同，比如有些是以太网，有些是无线网络等。 数据在底层传输时，可能会出现问题，比如丢包，乱序，数据出现错误。 跨网络传输时，不同网络能够发送的数据包大小，发送速度等都会不一样。 地址问题，如何对计算机进行地址编码 不同应用有不同的数据交互需求  2. TCP/IP协议的发展历史  1960 年代中期，不同的计算机还不能互相通信。 1967 年，ARPA（一个隶属于美国国防部的高级研究部门）提出了 ARPANET，在同一个网络中的不同计算机可以通过 IMP 节点相互通信。 1972 年，ARPA 的两个核心小组成员 Vint Cerf 和 Bob Kahn 提出 gateway 的概念，负责将数据从一个网络传递到另外一个网络。 1973 年，Cerf 和 Kahn 发表了关于点到点间的数据传输协议 TCP，提出了本地主机负责保证数据传输的可靠性。 1977 年，实现了在三个不同网络之间进行通信演示，后面TCP协议拆分成 Transmission Control Protocol 和 Internet Protocol 两个协议，两者结合起来就是我们现在所说的TCP/IP。 1981 年，UC Berkeley 大学在 Unix 系统中实现了 TCP/IP协议 1983 年, TCP/IP 协议正式成为 ARPANET 的官方协议，同时将军方专用的网络独立才出来，成立了 MILNET，ARPNET保留着给普通用户使用。  3. OSI 模型 在1970年代，International Standards Organization(ISO) 提出了 Open Systems Interconnection(OSI) 模型，包含了网络通信的所有方面，是一个分层了网络框架，可以使得不同的计算机系统可以在不改变其硬件和软件逻辑的基础上，实现相互通信。</description>
+    </item>
+    
+  </channel>
+</rss>

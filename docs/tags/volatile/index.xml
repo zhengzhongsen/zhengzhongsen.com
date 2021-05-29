@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>volatile on 郑仲森的个人博客</title>
+    <link>/tags/volatile/</link>
+    <description>Recent content in volatile on 郑仲森的个人博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 16 May 2021 19:02:47 +0800</lastBuildDate><atom:link href="/tags/volatile/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>volatile 在多线程中是否有必要使用？</title>
+      <link>/tech/2021/volatile-%E5%9C%A8%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%AD%E6%98%AF%E5%90%A6%E6%9C%89%E5%BF%85%E8%A6%81%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Sun, 16 May 2021 19:02:47 +0800</pubDate>
+      
+      <guid>/tech/2021/volatile-%E5%9C%A8%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%AD%E6%98%AF%E5%90%A6%E6%9C%89%E5%BF%85%E8%A6%81%E4%BD%BF%E7%94%A8/</guid>
+      <description>1. volatile 的作用 volatile，中文含义是容易发生变化的。这个修饰符将告诉 gcc 编译器，对这类变量的访问尽可能的减少优化。
+对C和C++而言，volatile 关键字在多线程编程中不是必须使用的。volatile并不会保证它修饰的变量的相关操作是原子性的和线程安全的，线程安全应该由线程同步和互斥的相关原语来保证。
+当然一些可能用到 volatile 修饰符的场景：
+ 访问内存映射IO的设备 在setjmp 和 longjmp 之间使用的变量 在信号处理函数里面使用 sig_atomic_t 变量 在代码里面没有修改这个变量的地方，但是可能通过一些外部手段修改，比如gdb，通过使用 volatile 修饰符，可以避免 gcc 进行优化  2. volatile 的使用效果对比 没有使用 volatile 修饰的测试代码 t1.c
+// t1.c static int s_foo = 1; int test() { if (s_foo == 2) { return 0; } return 1; } 使用gcc -S -O3 t1.c -o t1.s 生成对应的汇编代码如下，因为 s_foo 变量没有在其他地方被修改，所以可以看到 s_foo == 2 的条件判断被直接优化掉了，函数直接返回 1 ，如果这时候用 gdb 去将 s_foo修改为2，test 函数还是返回 1。</description>
+    </item>
+    
+  </channel>
+</rss>
