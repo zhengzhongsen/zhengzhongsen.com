@@ -44,6 +44,7 @@
     <li><a href="#2-常见问题">2. 常见问题</a>
       <ul>
         <li><a href="#21-vscode-和-hugo-的-markdown-图片路径问题">2.1 VSCode 和 Hugo 的 Markdown 图片路径问题</a></li>
+        <li><a href="#22-如何将-hugo-的文章同步到微信公众号">2.2 如何将 hugo 的文章同步到微信公众号？</a></li>
       </ul>
     </li>
   </ul>
@@ -106,7 +107,20 @@
 <p>vscode markdown 预览时，会去查找 <code>imgs/test.png</code> 文件，但是由于 <code>imgs</code> 目录软连接，所以实际是查找是 <code>static/imgs/test.png</code> 文件，也就可以正常显示图片了</p>
 </li>
 </ul>
+<h3 id="22-如何将-hugo-的文章同步到微信公众号">2.2 如何将 hugo 的文章同步到微信公众号？</h3>
+<p>我使用这个 <a href="https://markdown.com.cn/editor/">markdown 在线编辑站点</a> 将hugo的markdown格式的博客文章渲染成符合微信格式的富文本内容后，直接复制渲染后的内容到微信公众号上，然后进行微调即可。渲染的时候，排版主题选择默认主题，代码主题选择 monokai 模式。对原先markdown文章，会进行适度修改，比如会新增文章目录。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown"><span style="color:#75715e">## 0. 目录
+</span><span style="color:#75715e"></span>
+---
 
+[toc]
+
+---
+
+hugo博客文章正文 ... ...
+
+（全文完）
+</code></pre></div>
 
 <br/>
 (全文完)
@@ -128,7 +142,7 @@
   
 
 
-  <li><i>更新: 2021/05/16</i></li>
+  <li><i>更新: 2021/06/04</i></li>
 </ul>
 </div>
 
