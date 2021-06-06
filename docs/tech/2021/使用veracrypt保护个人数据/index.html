@@ -55,12 +55,14 @@
 </nav>
 <hr/>
 <h2 id="1-veracrypt-简介">1. VeraCrypt 简介</h2>
-<p>VeraCrypt 是一款创建和维护动态加密卷的开源加密软件。在使用过程中，它不会保存任何解密后的明文数据到磁盘上，即使是在加密卷被正确解密挂载到本地系统上，解密的数据也只是保存在内存中，加密卷中的整个文件系统都是加密的（比如文件名、文件夹、每个文件内容和文件元信息等数据都是加密的）。</p>
+<p>VeraCrypt 是一款创建和维护动态加密卷的开源加密软件。</p>
+<p>动态加密卷可以简单理解为一个加密文件，使用时需要将加密卷挂载到电脑上。挂载成功后，对用户而言，就是一个普通的磁盘，可以在里面创建文件目录，修改文件内容之类的。加密卷中的整个文件系统都是加密的，比如文件名、文件夹、每个文件内容和文件元信息等数据都是加密的。在使用过程中，它不会保存任何解密后的明文数据到磁盘上，即使是在加密卷被正确解密挂载到本地系统上，解密的数据也只是保存在内存中。这就保证了，就算攻击者强行关机拿到了磁盘上的加密卷文件，攻击者在不知道密码的情况下，也无法破解获取到加密卷里面的文件数据。</p>
 <p>用户只有输入正确的密码或者密钥文件，才可以正常读取（解密）存储在加密卷里面的数据。使用数据的整个过程都无需用户介入，在加载读取数据时，数据自动解密，保存在内存上。在保存数据前，数据自动加密存储在动态加密卷中。</p>
 <h2 id="2-如何使用veracrypt">2. 如何使用VeraCrypt</h2>
 <h3 id="21-安装-veracrypt">2.1 安装 VeraCrypt</h3>
 <ul>
-<li>从<a href="https://www.veracrypt.fr/en/Downloads.html"><strong>官网下载</strong></a>对应系统版本的软件安装包进行安装即可。</li>
+<li>从<a href="https://www.veracrypt.fr/en/Downloads.html"><strong>官网下载</strong></a>对应系统版本的软件安装包进行安装即可。
+<img src="/imgs/2021/veracrypt/win/dl.png" alt="img"></li>
 </ul>
 <h3 id="22-创建加密卷">2.2 创建加密卷</h3>
 <ul>
@@ -71,7 +73,7 @@
 <img src="/imgs/2021/veracrypt/win/cj3.jpg" alt="img"></p>
 </li>
 <li>
-<p>选择你加密卷文件的路径和文件名，比如我这里就创建了 <code>/User/zzs/test.data</code> 加密卷文件，这里的路径需要记住，后面挂载加密卷的时候需要用到这个文件。
+<p>选择你加密卷文件的路径和文件名，比如我这里就创建了 <code>D:\test\test.data</code> 加密卷文件，这里的路径需要记住，后面挂载加密卷的时候需要用到这个文件。
 <img src="/imgs/2021/veracrypt/win/cj4.jpg" alt="img"></p>
 </li>
 <li>
@@ -113,16 +115,16 @@
 <img src="/imgs/2021/veracrypt/win/sy1.jpg" alt="img"></p>
 </li>
 <li>
-<p>点击 <code>mount</code> 后会弹出密码窗口，输入之前设置的加密卷密码，点击OK即可
+<p>点击 <code>mount</code> 后会弹出密码窗口，输入之前设置的加密卷密码，点击OK即可。
 <img src="/imgs/2021/veracrypt/win/sy2.jpg" alt="img"></p>
 </li>
 <li>
-<p>这时就可以看到加密卷文件 test.data 已经被挂载到驱动器A上面了，在计算机那里也可以看到磁盘A
+<p>这时就可以看到加密卷文件 test.data 已经被挂载到驱动器A上面了，在计算机那里也可以看到磁盘A。
 <img src="/imgs/2021/veracrypt/win/sy3.jpg" alt="img">
 <img src="/imgs/2021/veracrypt/win/sy4.jpg" alt="img"></p>
 </li>
 <li>
-<p>后面就可以想普通磁盘一样，使用加密卷，比如说在里面创建个文件hello.txt
+<p>后面就可以像普通磁盘一样，使用加密卷，比如说在里面创建个文件hello.txt。
 <img src="/imgs/2021/veracrypt/win/sy5.jpg" alt="img"></p>
 </li>
 <li>
