@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon"　/>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>
+      
+      使用 VeraCrypt 保护个人数据 | 郑仲森的个人博客</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">主页</a></li>
+      
+      <li><a href="/tech/">技术</a></li>
+      
+      <li><a href="/life/">生活</a></li>
+      
+      <li><a href="/categories/">专题</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/about/">关于</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">使用 VeraCrypt 保护个人数据</span></h1>
+</div>
+
+<main>
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-veracrypt-简介">1. VeraCrypt 简介</a></li>
+    <li><a href="#2-如何使用veracrypt">2. 如何使用VeraCrypt</a>
+      <ul>
+        <li><a href="#21-安装-veracrypt">2.1 安装 VeraCrypt</a></li>
+        <li><a href="#22-创建加密卷">2.2 创建加密卷</a></li>
+        <li><a href="#23-使用加密卷">2.3 使用加密卷</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-一些建议">3. 一些建议</a></li>
+    <li><a href="#4-参考资料">4. 参考资料</a></li>
+  </ul>
+</nav>
+<hr/>
+<h2 id="1-veracrypt-简介">1. VeraCrypt 简介</h2>
+<p>VeraCrypt 是一款创建和维护动态加密卷的开源加密软件。在使用过程中，它不会保存任何解密后的明文数据到磁盘上，即使是在加密卷被正确解密挂载到本地系统上，解密的数据也只是保存在内存中，加密卷中的整个文件系统都是加密的（比如文件名、文件夹、每个文件内容和文件元信息等数据都是加密的）。</p>
+<p>用户只有输入正确的密码或者密钥文件，才可以正常读取（解密）存储在加密卷里面的数据。使用数据的整个过程都无需用户介入，在加载读取数据时，数据自动解密，保存在内存上。在保存数据前，数据自动加密存储在动态加密卷中。</p>
+<h2 id="2-如何使用veracrypt">2. 如何使用VeraCrypt</h2>
+<h3 id="21-安装-veracrypt">2.1 安装 VeraCrypt</h3>
+<ul>
+<li>从<a href="https://www.veracrypt.fr/en/Downloads.html"><strong>官网下载</strong></a>对应系统版本的软件安装包进行安装即可。</li>
+</ul>
+<h3 id="22-创建加密卷">2.2 创建加密卷</h3>
+<ul>
+<li>
+<p>打开 VeraCrypt 软件，点击 <code>Create Volume</code> 开始创建加密卷，一路<code>next</code>默认即可。
+<img src="/imgs/2021/veracrypt/win/cj1.jpg" alt="img">
+<img src="/imgs/2021/veracrypt/win/cj2.jpg" alt="img">
+<img src="/imgs/2021/veracrypt/win/cj3.jpg" alt="img"></p>
+</li>
+<li>
+<p>选择你加密卷文件的路径和文件名，比如我这里就创建了 <code>/User/zzs/test.data</code> 加密卷文件，这里的路径需要记住，后面挂载加密卷的时候需要用到这个文件。
+<img src="/imgs/2021/veracrypt/win/cj4.jpg" alt="img"></p>
+</li>
+<li>
+<p>加密算法按照默认推荐的选项即可，安全性已经比较高了。
+<img src="/imgs/2021/veracrypt/win/cj5.jpg" alt="img"></p>
+</li>
+<li>
+<p>加密卷大小可以根据你实际要加密保护的个人数据大小来设置，这里只是测试用途，就简单设置了10MB大小。如果你可能会有10多GB的文件数据需要加密保护，则可以将大小改为20GB之类的。
+<img src="/imgs/2021/veracrypt/win/cj6.jpg" alt="img"></p>
+</li>
+<li>
+<p>设置加密卷的使用密码，这个密码设置完后<strong>一定要记住</strong>。后面使用这个加密卷的时候，需要这里设置的密码。
+<img src="/imgs/2021/veracrypt/win/cj7.jpg" alt="img"></p>
+</li>
+<li>
+<p>在Windows系统上，推荐选择 NTFS 文件系统。
+<img src="/imgs/2021/veracrypt/win/cj9.jpg" alt="img"></p>
+</li>
+<li>
+<p>在VeraCrypt的窗口上移动鼠标，保证密钥生产的随机性，最后点击 <code>Format</code>选项进行格式化文件。
+<img src="/imgs/2021/veracrypt/win/cj10.jpg" alt="img"></p>
+</li>
+<li>
+<p>最后加密卷文件生成成功，加密卷文件路径为 <code>D:\test\test.data</code>。
+<img src="/imgs/2021/veracrypt/win/cj11.jpg" alt="img">
+<img src="/imgs/2021/veracrypt/win/cj12.jpg" alt="img"></p>
+</li>
+</ul>
+<h3 id="23-使用加密卷">2.3 使用加密卷</h3>
+<ul>
+<li>
+<p>打开 VeraCrypt 软件，随便选择一个没有被使用的驱动器，比如我这里选择了第1个驱动器盘符A。</p>
+</li>
+<li>
+<p>点击<code>Select File...</code>找到之前生成的加密卷文件 <code>test.data</code></p>
+</li>
+<li>
+<p>点击 <code>mount</code> 挂载加密卷到本地磁盘。
+<img src="/imgs/2021/veracrypt/win/sy1.jpg" alt="img"></p>
+</li>
+<li>
+<p>点击 <code>mount</code> 后会弹出密码窗口，输入之前设置的加密卷密码，点击OK即可
+<img src="/imgs/2021/veracrypt/win/sy2.jpg" alt="img"></p>
+</li>
+<li>
+<p>这时就可以看到加密卷文件 test.data 已经被挂载到驱动器A上面了，在计算机那里也可以看到磁盘A
+<img src="/imgs/2021/veracrypt/win/sy3.jpg" alt="img">
+<img src="/imgs/2021/veracrypt/win/sy4.jpg" alt="img"></p>
+</li>
+<li>
+<p>后面就可以想普通磁盘一样，使用加密卷，比如说在里面创建个文件hello.txt
+<img src="/imgs/2021/veracrypt/win/sy5.jpg" alt="img"></p>
+</li>
+<li>
+<p>使用加密卷完毕后，点击<code>Dismount</code>卸载掉加密卷即可。
+<img src="/imgs/2021/veracrypt/win/sy6.jpg" alt="img"></p>
+</li>
+</ul>
+<h2 id="3-一些建议">3. 一些建议</h2>
+<ul>
+<li>一定要记住密码！！！密码一旦忘记了，加密卷里面的数据就无法解密了。</li>
+<li>加密卷文件的大小可以根据实际使用情况设置。</li>
+<li>定期备份重要文件。</li>
+</ul>
+<h2 id="4-参考资料">4. 参考资料</h2>
+<ul>
+<li><a href="https://www.veracrypt.fr/en/Home.html">VeraCrypt官网</a></li>
+</ul>
+
+
+<br/>
+(全文完)
+</main>
+<hr/>
+<div class="single-footer">
+<ul>
+  
+  
+  
+  
+
+
+  <li><i>更新: 2021/06/06</i></li>
+</ul>
+</div>
+
+
+  <footer>
+  
+  
+  <hr/>
+  © 2020 &ndash; 2021 <a href="/">郑仲森</a> | <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0</a>
+  
+  </footer>
+  </body>
+</html>
+
